@@ -16,9 +16,7 @@
 
 # The script configures the Slurm cluster after the deployment. Replace <bucket> with your bucket name.
 
-. "/etc/parallelcluster/cfnconfig"
-
-bucket="<bucket>"
+#bucket="<bucket>"
 
 if [ "${cfn_node_type}" == "ComputeFleet" ];then
 
@@ -125,7 +123,7 @@ EOF
 #!/bin/bash
 
 #slurm directory
-export SLURM_ROOT=/opt/slurm
+export SLURM_ROOT=/sw/apps/slurm/active
 echo "${SLURM_JOB_USER}" >> /tmp/jobs/jobs_users
 echo "${SLURM_JOBID}" >> /tmp/jobs/jobs_ids
 
@@ -141,7 +139,7 @@ EOF
    cat <<'EOF' > /opt/slurm/sbin/epilog.sh
 #!/bin/bash
 #slurm directory
-export SLURM_ROOT=/opt/slurm
+export SLURM_ROOT=/sw/apps/slurm/active
 sed -i "0,/${SLURM_JOB_USER}/d" /tmp/jobs/jobs_users
 sed -i "0,/${SLURM_JOBID}/d" /tmp/jobs/jobs_ids
 
@@ -154,23 +152,24 @@ fi
 
 EOF
 
+   export SLURM_ROOT=/sw/apps/slurm/active
    chmod +x /opt/slurm/sbin/prolog.sh
    chmod +x /opt/slurm/sbin/epilog.sh
    
    # Configure slurm to use Prolog and Epilog
-   echo "PrologFlags=Alloc" >> /opt/slurm/etc/slurm.conf
-   echo "Prolog=/opt/slurm/sbin/prolog.sh" >> /opt/slurm/etc/slurm.conf
-   echo "Epilog=/opt/slurm/sbin/epilog.sh" >> /opt/slurm/etc/slurm.conf
+   echo "PrologFlags=Alloc" >> /etc/slurm/slurm.conf
+   echo "Prolog=$SLURM_ROOT/sbin/prolog.sh" >> /etc/slurm/slurm.conf
+   echo "Epilog=$SLURM_ROOT/sbin/epilog.sh" >> /etc/slurm/slurm.conf
    
    # Configure sbatch wrapper
-   mv /opt/slurm/bin/sbatch /opt/slurm/sbin/sbatch
-   aws s3 cp s3://${bucket}/sbatch /opt/slurm/bin/sbatch
-   chmod +x /opt/slurm/bin/sbatch
+   #mv /opt/slurm/bin/sbatch /opt/slurm/sbin/sbatch
+   #aws s3 cp s3://${bucket}/sbatch /opt/slurm/bin/sbatch
+   #chmod +x /opt/slurm/bin/sbatch
    
-   mv /opt/slurm/bin/srun /opt/slurm/sbin/srun
-   ln -s /opt/slurm/bin/sbatch /opt/slurm/bin/srun
+   #mv /opt/slurm/bin/srun /opt/slurm/sbin/srun
+   #ln -s /opt/slurm/bin/sbatch /opt/slurm/bin/srun
 
-   aws s3 cp s3://${bucket}/projects_list.conf /opt/slurm/etc/projects_list.conf
+   #aws s3 cp s3://${bucket}/projects_list.conf /opt/slurm/etc/projects_list.conf
 
 
    systemctl restart slurmctld

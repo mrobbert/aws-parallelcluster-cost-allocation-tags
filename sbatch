@@ -15,6 +15,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # The script is used as wrapper to the Slurm sbatch command. Replace <account_id> with the id of your account.
+# This script is only used for checking budgets at submit time. Not using on Apex for now
 
 parameters=$@
 
