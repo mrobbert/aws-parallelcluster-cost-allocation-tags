@@ -26,7 +26,7 @@ if [ "${cfn_node_type}" == "ComputeFleet" ];then
 
   # Configure the script to run every minute
   echo "
-* * * * * /opt/slurm/sbin/check_tags.sh
+* * * * * /etc/slurm/check_tags.sh
 " | crontab -
   exit 0
 else
